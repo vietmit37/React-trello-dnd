@@ -1,10 +1,15 @@
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Card, Avatar, Tooltip, Button, Popconfirm, Modal, Input, Form, Select } from 'antd';
 import { DeleteOutlined, PlusOutlined } from '@ant-design/icons';
+import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 
 // components
 import TrelloCard from './components/TrelloCard';
+import TrelloList from './components/TrelloList';
+
+// mock data
+import  { data } from './mocks/data'
 
 const { TextArea } = Input;
 const { Option } = Select;
@@ -17,7 +22,9 @@ for (let i = 10; i < 36; i++) {
   });
 }
 
-console.log('tuong')
+console.log('tuong');
+
+console.log('abc')
 
 function App() {
   const [form] = Form.useForm();
@@ -77,6 +84,12 @@ function App() {
     });
   }
 
+  // using useCallback is optional
+  const onDragEnd = () => {
+    // the only one that is required
+    console.log('onDragEnd')
+  };
+
   return (
     <>
       <header>
@@ -92,40 +105,40 @@ function App() {
 
         <main>
           <div className="container">
-            <div className="content">
-              <Card title="List 1" 
-                className="cardList"
-                extra={
-                  <>
-                    <Tooltip title="Add a card">
-                      <Button shape="circle" icon={<PlusOutlined />} onClick={() => setOpen(true)} />
-                    </Tooltip>
+            <DragDropContext
+              onDragEnd={onDragEnd}
+            >
+              <Droppable droppableId="all-lists" direction='horizontal' type="LIST">
+                {(provided) => (
+                  <div
+                    ref={provided.innerRef}
+                    // style={{ backgroundColor: snapshot.isDraggingOver ? 'blue' : 'grey' }}
+                    {...provided.droppableProps}
+                    className='listContainer'
+                  >
+                    {data.columns.map((listId, listIndex) => {
+                      const listItem = data.lists[listId];
+                      const cards = listItem.cards.map(cardId => data.cards[cardId]);
+                      return (
+                        <TrelloList 
+                          key={listItem.id}
+                          index={listIndex}
+                          listItem={listItem}
+                          cards={cards}
+                        />
+                      )
+                    })}
 
-                    <Popconfirm
-                      title="Delete the list"
-                      description="Are you sure to delete this list?"
-                      onConfirm={() => {}}
-                      onCancel={() => {}}
-                      okText="Yes"
-                      cancelText="No"
-                      className="ml-10"
-                    >
-                      <Tooltip title="Delete this list">
-                        <Button shape="circle" icon={<DeleteOutlined />} />
-                      </Tooltip>
-                    </Popconfirm>
-                  </>
-                } 
-              >
-                <TrelloCard />
-                <TrelloCard />
-              
-              </Card>
-        
-              
+                    {provided.placeholder}
 
-              <Button type="text"><PlusOutlined /> Add another list</Button>
-            </div>
+                    <Button type="text"><PlusOutlined /> Add another list</Button>
+
+                  </div>
+                )}
+                
+              </Droppable>
+            </DragDropContext>
+            
           </div>
         </main>
 

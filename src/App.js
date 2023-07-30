@@ -17,6 +17,8 @@ for (let i = 10; i < 36; i++) {
   });
 }
 
+console.log('tuong')
+
 function App() {
   const [form] = Form.useForm();
   const [open, setOpen] = useState(false);

@@ -1,11 +1,10 @@
 
 import React, { useState } from 'react';
-import { Card, Avatar, Tooltip, Button, Popconfirm, Modal, Input, Form, Select } from 'antd';
-import { DeleteOutlined, PlusOutlined } from '@ant-design/icons';
+import { Avatar, Tooltip, Button, Modal, Input, Form, Select } from 'antd';
+import { PlusOutlined } from '@ant-design/icons';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 
 // components
-import TrelloCard from './components/TrelloCard';
 import TrelloList from './components/TrelloList';
 
 // mock data
@@ -22,14 +21,11 @@ for (let i = 10; i < 36; i++) {
   });
 }
 
-console.log('tuong');
-
-console.log('abc')
-
 function App() {
   const [form] = Form.useForm();
   const [open, setOpen] = useState(false);
   const [confirmLoading, setConfirmLoading] = useState(false);
+  const [todos, setTodos] = React.useState(data);
 
   const handleSubmit = (values) => {
     console.log('values: ', values)
@@ -85,10 +81,71 @@ function App() {
   }
 
   // using useCallback is optional
-  const onDragEnd = () => {
-    // the only one that is required
-    console.log('onDragEnd')
+  const onDragEnd = (result) => {
+    console.log('onDragEnd: ', result)
+    const { type, source, destination } = result;
+
+    // 4. nothing
+    if(!destination) {
+      alert('Not happend!');
+      return
+    }
+
+    // drag & drop list
+    if(type === 'LIST'){
+      // something logic
+      
+      return;
+    }
+    
+    // CARD
+    // 1. drag & drop card same list
+    if(source.droppableId === destination.droppableId) {
+      // code logic default moving card
+      // const listId = destination.droppableId;
+      // const listItem = todos.lists[listId]
+      // const cardItem = listItem.cards.splice(source.index, 1)[0]; // get cardItem cut
+      // listItem.cards.splice(destination.index, 0, cardItem); // add item;
+
+      // setTodos(prevState => ({
+      //   ...prevState,
+      //   lists: {
+      //     ...prevState.lists,
+      //     [listId]: {
+      //       ...prevState.lists[listId],
+      //       cards: listItem.cards
+      //     }
+      //   }
+      // }))
+
+      // code logic swap item
+      const listId = destination.droppableId;
+      const listItem = todos.lists[listId]
+      const cards = listItem.cards;
+      [cards[source.index], cards[destination.index]] = [cards[destination.index], cards[source.index]];
+
+      setTodos(prevState => ({
+        ...prevState,
+        lists: {
+          ...prevState.lists,
+          [listId]: {
+            ...prevState.lists[listId],
+            cards: cards
+          }
+        }
+      }))
+      
+      return;
+    }
+
+    // 2. drag & drop card between lists
+
+    
+    
+    
   };
+
+  console.log("todos: ", todos)
 
   return (
     <>
@@ -116,9 +173,9 @@ function App() {
                     {...provided.droppableProps}
                     className='listContainer'
                   >
-                    {data.columns.map((listId, listIndex) => {
-                      const listItem = data.lists[listId];
-                      const cards = listItem.cards.map(cardId => data.cards[cardId]);
+                    {todos.columns.map((listId, listIndex) => {
+                      const listItem = todos.lists[listId];
+                      const cards = listItem.cards.map(cardId => todos.cards[cardId]);
                       return (
                         <TrelloList 
                           key={listItem.id}

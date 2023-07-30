@@ -49,10 +49,10 @@ function TrelloCard({ card, index }) {
             ]}
           >
             <Meta
-              title="Learn javascript"
+              title={card.title}
               description={
                 <>
-                  <div>This is description</div>
+                  <div>{card.description}</div>
                   <Avatar.Group
                     maxCount={2}
                     maxPopoverTrigger="click"
